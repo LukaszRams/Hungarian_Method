@@ -1,5 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
 import numpy as np
 from typing import Union, Tuple
 from collections import Counter
@@ -12,7 +10,7 @@ def set_zeros(matrix: np.ndarray, fi: Union[int, float]) -> Tuple[np.ndarray, np
     Slajd 2
     Poszykiwanie kompletnego przydziału
     ================================================================================================
-
+    
     Funkcja wyznacza zera niezależne oraz zera zależne.
     Zasada działania:
 
@@ -30,8 +28,11 @@ def set_zeros(matrix: np.ndarray, fi: Union[int, float]) -> Tuple[np.ndarray, np
                 jeśli wartości w elemencie się powtarzają (z wyjątkiem -1):
                     wybierz następny element
                 jeśli nie:
-                    ustaw best_sol_size jako liczba niezależnych zer z danego elementu (tj. rozmiar elementu - liczba wartości "-1")
-                    ustaw best_sol jako ten element
+                        jeśli liczba niezależnych zer z danego elementu > best_sol_size:
+                            ustaw best_sol_size jako liczba niezależnych zer z danego elementu (tj. rozmiar elementu - liczba wartości "-1")
+                            ustaw best_sol jako ten element
+                        jeśli nie:
+                            wybierz następny element
                 jeśli best_sol_size wynosi tyle co rozmiar macierzy:
                     zakończ
                 jeśli nie:
@@ -78,8 +79,11 @@ def set_zeros(matrix: np.ndarray, fi: Union[int, float]) -> Tuple[np.ndarray, np
         if tmp2:
             continue
         else:
-            best_sol_size = size - tmp[-1] if tmp[-1] else size
-            best_sol = elem
+            if (tmp[-1] and size - tmp[-1] > best_sol_size) or not tmp[-1]:
+                best_sol_size = size - tmp[-1] if tmp[-1] else size
+                best_sol = elem
+            else:
+                continue
         if best_sol_size == size:
             break
 
@@ -108,7 +112,3 @@ def set_zeros(matrix: np.ndarray, fi: Union[int, float]) -> Tuple[np.ndarray, np
         print("\nMacierz zer niezależnych")
         print(matrix_to_return)
         return matrix, matrix_to_return, fi  # tu powinno być wywołanie kolejnej funkcji
-
-
-
-
