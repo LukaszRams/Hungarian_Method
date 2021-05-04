@@ -26,7 +26,7 @@ def set_zeros(matrix: np.ndarray, fi: Union[int, float]) -> Tuple[np.ndarray, np
     3. Wyznaczenie najlepszego dopasowania:
             1. Przejście po wszystkich elementach:
                 jeśli wartości w elemencie się powtarzają (z wyjątkiem -1):
-                    wybierz następny element
+                        zamień kolejne powtórzenia wartości na -1
                 jeśli nie:
                         jeśli liczba niezależnych zer z danego elementu > best_sol_size:
                             ustaw best_sol_size jako liczba niezależnych zer z danego elementu (tj. rozmiar elementu - liczba wartości "-1")
@@ -54,8 +54,8 @@ def set_zeros(matrix: np.ndarray, fi: Union[int, float]) -> Tuple[np.ndarray, np
     """
     # etap 1
     lol: List[List[int]] = list()
-    best_sol: Optional[Tuple[int]] = None
-    best_sol_size: Optional[int] = None
+    best_sol: Optional[Tuple[int]] = []
+    best_sol_size: Optional[int] = 0
     size: int = matrix.shape[0]
     for row in matrix:
         lol.append([])
@@ -77,13 +77,17 @@ def set_zeros(matrix: np.ndarray, fi: Union[int, float]) -> Tuple[np.ndarray, np
                 tmp2 = True
                 break
         if tmp2:
-            continue
+            elem = list(elem)
+            for i in range(len(elem)):
+                if elem[i] in elem[:i]:
+                    elem[i] = -1
+            elem = tuple(elem)
+            tmp = Counter(elem)
+        if (tmp[-1] and size - tmp[-1] > best_sol_size) or not tmp[-1]:
+            best_sol_size = size - tmp[-1] if tmp[-1] else size
+            best_sol = elem
         else:
-            if (tmp[-1] and size - tmp[-1] > best_sol_size) or not tmp[-1]:
-                best_sol_size = size - tmp[-1] if tmp[-1] else size
-                best_sol = elem
-            else:
-                continue
+            continue
         if best_sol_size == size:
             break
 
@@ -102,13 +106,11 @@ def set_zeros(matrix: np.ndarray, fi: Union[int, float]) -> Tuple[np.ndarray, np
         fit: str = ""
         for i in range(size):
             fit += f"zadanie: {i} --> maszyna: {best_sol[i]}\n"
-        print(matrix)
         print("\nMacierz zer niezależnych")
         print(matrix_to_return)
         print("Dopasowanie:\n", fit, "\nKoszt:\n", str(fi))
 
     else:
-        print(matrix)
         print("\nMacierz zer niezależnych")
         print(matrix_to_return)
         return matrix, matrix_to_return, fi  # tu powinno być wywołanie kolejnej funkcji
